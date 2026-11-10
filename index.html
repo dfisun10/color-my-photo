@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Early access</title>
+<meta name="description" content="Turn any photo into a printable coloring page. Join early access.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top"><span class="brand" data-name></span></header>
+
+<main>
+<section class="hero">
+  <h1>Turn any photo into a coloring page your child will love</h1>
+  <p class="sub">Upload a photo of your kid, pet or home. Get a clean, printable page in seconds.</p>
+  <button class="btn" id="btn-make" type="button">Make my coloring page</button>
+  <p class="small">Coming soon — join early access</p>
+</section>
+
+<section class="gallery">
+  <h2>Before and after</h2>
+  <div class="pairs">
+    <figure class="pair"><img src="samples/photo_child.jpg" alt="Example photo of a child" loading="lazy" width="400" height="400"><img src="samples/page_child.png" alt="Coloring page made from the child photo" loading="lazy" width="400" height="400"></figure>
+    <figure class="pair"><img src="samples/photo_09.jpg" alt="Example photo 9" loading="lazy" width="400" height="400"><img src="samples/page_09.png" alt="Coloring page made from photo 9" loading="lazy" width="400" height="400"></figure>
+    <figure class="pair"><img src="samples/photo_04.jpg" alt="Example photo 4" loading="lazy" width="400" height="400"><img src="samples/page_04.png" alt="Coloring page made from photo 4" loading="lazy" width="400" height="400"></figure>
+  </div>
+  <p class="small">Example photos and pages. The child photo is AI-generated, not a real child.</p>
+</section>
+
+<section class="how">
+  <h2>How it works</h2>
+  <ol class="steps">
+    <li><b>1</b> Upload a photo</li>
+    <li><b>2</b> We draw clean, bold outlines</li>
+    <li><b>3</b> Print on A4 or Letter</li>
+  </ol>
+</section>
+
+<section class="pricing">
+  <div class="card">
+    <h2>Your photo coloring book</h2>
+    <p>One-time $12 (planned price): a 20-page printable coloring book made from your own photos. A gift for birthdays, grandparents or a rainy day. A4 and Letter. No subscription.</p>
+    <button class="btn" id="btn-pro" type="button">Get my book (early access)</button>
+    <p class="small">Free plan planned: 3 pages a day.</p>
+  </div>
+</section>
+</main>
+
+<footer>
+  <p>Early-access test. No payment is taken. Emails are stored in Google Forms and used only to tell you when we open; unsubscribe any time by replying.</p>
+  <p><a href="privacy.html">Privacy</a></p>
+</footer>
+
+<div class="modal" id="modal" hidden>
+  <form class="dialog" id="form" novalidate role="dialog" aria-modal="true" aria-labelledby="mt">
+    <button type="button" class="close" id="close" aria-label="Close">&times;</button>
+    <p id="mt">We're opening soon. Leave your email and we'll tell you first.</p>
+    <div id="fields">
+      <input type="email" id="email" placeholder="you@example.com" autocomplete="email" aria-label="Email" required>
+      <button class="btn" type="submit">Notify me</button>
+    </div>
+    <p class="msg" id="msg" role="status"></p>
+  </form>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
