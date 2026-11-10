@@ -26,3 +26,5 @@ a{color:var(--accent)}
 .close{position:absolute;top:6px;right:10px;background:none;border:0;font-size:1.8rem;cursor:pointer}
 .msg{min-height:1.4em;margin:.5em 0 0;font-weight:600}
 @media(min-width:640px){.pairs{grid-template-columns:1fr 1fr}h1{font-size:2.6rem}.steps{grid-template-columns:repeat(3,1fr)}}
+.notice{max-width:760px;margin:0 auto;padding:8px 18px;background:#fff1d6;border-bottom:1px solid var(--line);font-size:.9rem;text-align:center}
+.btn:disabled{opacity:.6;cursor:wait}

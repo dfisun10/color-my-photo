@@ -20,7 +20,12 @@ const ABACUS_NS = "cmp-live-q9w2";
       email = document.getElementById("email"), msg = document.getElementById("msg"),
       fields = document.getElementById("fields");
 
-  function open(key) { hit(key); msg.textContent = ""; fields.hidden = false; modal.hidden = false; email.focus(); }
+  var mt = document.getElementById("mt"), send = document.getElementById("send");
+  var TEXT = {
+    click_make: "The tool isn't open yet. Leave your email and we'll tell you the day it opens.",
+    click_pro: "The $12 photo coloring book isn't on sale yet, so there is nothing to pay now. Leave your email and we'll tell you first."
+  };
+  function open(key) { hit(key); mt.textContent = TEXT[key]; msg.textContent = ""; fields.hidden = false; send.disabled = false; modal.hidden = false; email.focus(); }
   function close() { modal.hidden = true; }
   document.getElementById("btn-make").onclick = function () { open("click_make"); };
   document.getElementById("btn-pro").onclick = function () { open("click_pro"); };
@@ -32,10 +37,12 @@ const ABACUS_NS = "cmp-live-q9w2";
     ev.preventDefault();
     var v = email.value.trim();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) { msg.textContent = "Please enter a valid email."; return; }
-    function done() { hit("email_submit"); fields.hidden = true; msg.textContent = "Thanks — you're on the list."; }
+    function done() { hit("email_submit"); fields.hidden = true; msg.textContent = "Thanks, you're on the list. We'll email you once, when it opens."; }
     if (!FORM_ACTION_URL || !ENTRY_ID) { console.log("[early-access] form not configured; email:", v); done(); return; }
+    if (send.disabled) return;
+    send.disabled = true; msg.textContent = "Sending…";
     var body = new URLSearchParams(); body.set("entry." + ENTRY_ID, v);
     fetch(FORM_ACTION_URL, { method: "POST", mode: "no-cors", body: body })
-      .then(done).catch(function () { msg.textContent = "Something went wrong. Please try again."; });
+      .then(done).catch(function () { send.disabled = false; msg.textContent = "Something went wrong. Please check your connection and try again."; });
   });
 })();
