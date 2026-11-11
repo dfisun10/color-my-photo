@@ -1,0 +1,131 @@
+/* Color My Photo - home page only (loaded after make.css, same paper-and-ink system).
+   Holds: the long-headline hero sizes, "Who would you color first?" (chips + crayon-sweep card),
+   the gift section with the cover sketch, and the small blocks the home page had inline. */
+
+/* ---------- hero: a longer headline than the shop page ---------- */
+.home h1{font-size:clamp(2.5rem,5.1vw,4.2rem);line-height:1.04}
+.home .hero .lede{max-width:46ch}
+@media(max-width:560px){.home h1{font-size:clamp(2rem,9.6vw,2.6rem)}}
+
+/* ---------- 01 ideas ---------- */
+.ideas h2,.present h2{font-size:clamp(2rem,4.6vw,3.4rem)}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin:26px 0 0;padding:0 0 12px}
+.chip{appearance:none;flex:none;min-height:48px;padding:0 22px;border-radius:999px;border:1.5px solid var(--ink);background:var(--sheet);color:var(--ink);font:700 1rem/1 var(--sans);white-space:nowrap;cursor:pointer;transition:background-color .2s,color .2s,transform .25s var(--ease)}
+.chip:hover{transform:translateY(-2px)}
+.chip:active{transform:scale(.97)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.chip:focus-visible{outline-offset:2px;border-radius:999px}
+
+.idea{display:grid;grid-template-columns:minmax(0,1fr);gap:26px;margin-top:26px}
+.chips:not([hidden])+.idea{margin-top:12px}
+.idea-fig{margin:0;min-width:0}
+.idea-fig figcaption{margin-top:12px;font:400 .76rem/1.5 var(--mono);color:var(--ink-2);text-wrap:balance}
+
+/* without JavaScript: photo and page side by side */
+.idea-card{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.idea-photo,.idea-page{position:relative;aspect-ratio:4/5;border-radius:4px;overflow:hidden;background:var(--sheet);box-shadow:var(--shadow)}
+.idea-card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 28%;transition:opacity .2s;-webkit-user-drag:none;user-select:none}
+.idea-page img{filter:brightness(1.05)}
+.idea-card .tag{position:absolute;bottom:10px;max-width:calc(100% - 20px);z-index:1;padding:5px 9px;border-radius:10px;background:rgba(251,250,247,.94);color:var(--ink);font:400 .66rem/1.25 var(--mono);letter-spacing:.03em}
+.idea-photo .tag{left:10px}
+.idea-page .tag{right:10px}
+.js .idea-card .tag{max-width:calc(50% - 16px);left:8px}
+.js .idea-page .tag{left:auto;right:8px}
+.idea-line{display:none}
+
+/* with JavaScript: one card, the page is wiped over the photo; --p = where the divider sits: photo to its left, page to its right (1 = all photo, 0 = all page) */
+.js .idea-card{--p:1;display:block;aspect-ratio:4/5;border-radius:4px;overflow:hidden;background:var(--sheet);box-shadow:var(--shadow);touch-action:pan-y;-webkit-user-select:none;user-select:none}
+.js .idea-photo,.js .idea-page{position:absolute;inset:0;aspect-ratio:auto;border-radius:0;box-shadow:none}
+.js .idea-page{background:#fff;clip-path:inset(0 0 0 calc(var(--p) * 100%))}
+.js .idea-line{display:block;position:absolute;top:0;bottom:0;left:calc(var(--p) * 100%);width:4px;margin-left:-2px;background:var(--accent);pointer-events:none}
+.idea-crayon{position:absolute;left:-6px;top:calc(50% - 84px);width:16px;height:84px;transform-origin:50% 100%;transform:rotate(-24deg);border-radius:3px 3px 0 0;background:linear-gradient(var(--accent) 0 58%,var(--accent-soft) 0 64%,var(--accent) 0 70%,var(--accent-ink) 0);clip-path:polygon(0 0,100% 0,100% 82%,50% 100%,0 82%);filter:drop-shadow(0 6px 6px rgba(24,23,28,.3));transition:opacity .3s}
+.idea-handle{appearance:none;position:absolute;top:50%;left:clamp(30px,calc(var(--p) * 100%),calc(100% - 30px));width:48px;height:48px;margin:-24px 0 0 -24px;padding:0;border:0;border-radius:50%;background:var(--sheet);box-shadow:0 0 0 2.5px var(--ink),0 10px 20px -6px rgba(24,23,28,.55);cursor:ew-resize;touch-action:none;opacity:0;transform:scale(.5);transition:opacity .25s,transform .4s var(--ease)}
+.idea-handle::before,.idea-handle::after{content:"";position:absolute;top:50%;width:9px;height:9px;margin-top:-5px;border-left:2.5px solid var(--ink);border-bottom:2.5px solid var(--ink)}
+.idea-handle::before{left:11px;transform:rotate(45deg)}
+.idea-handle::after{right:11px;transform:rotate(-135deg)}
+.idea-handle:focus-visible{border-radius:50%}
+.idea-card.ready .idea-handle{opacity:1;transform:none}
+.idea-card.ready .idea-crayon{opacity:0}
+.idea-card.sweep .idea-page{transition:clip-path var(--t,.9s) var(--wipe)}
+.idea-card.sweep .idea-line{transition:left var(--t,.9s) var(--wipe)}
+.idea-card.sweep .idea-handle{transition:left var(--t,.9s) var(--wipe),opacity .25s,transform .4s var(--ease)}
+.idea-card.ready{--t:.6s}
+.ideas.swap .idea-card img{opacity:0}
+.ideas.wait .idea{visibility:hidden}
+
+.idea-copy{min-width:0;transition:opacity .2s}
+.ideas.swap .idea-copy{opacity:0}
+.idea-hook{font:400 clamp(1.7rem,3.3vw,2.7rem)/1.1 var(--serif);letter-spacing:-.02em;margin:0;text-wrap:balance}
+.idea-good{margin:16px 0 24px;color:var(--ink-2);max-width:40ch}
+.idea-good b,.more b,.more-label,.cover-brand,.field>span,.from legend{font:400 .72rem/1.2 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2)}
+.idea-good b{display:block;margin-bottom:6px}
+.idea-copy .btn{white-space:normal;text-align:left;max-width:100%}
+.idea-copy .small{max-width:40ch;margin-top:16px}
+@media(max-width:560px){.idea-copy .btn{width:100%;justify-content:space-between}.chips{gap:8px 6px}.chip{flex:1 1 auto;padding:0 8px;font-size:.88rem}}
+@media(min-width:900px){
+  .idea{grid-template-columns:repeat(12,minmax(0,1fr));gap:24px;align-items:center;margin-top:20px}
+  .idea-fig{grid-column:span 5}
+  .idea-copy{grid-column:7 / span 6}
+}
+
+.more-label{margin:64px 0 0;padding-bottom:14px;border-bottom:1.5px solid var(--ink)}
+.more{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:minmax(0,1fr);gap:0 32px}
+.more li{padding:16px 0;border-bottom:1px solid var(--rule);min-width:0}
+.more b{display:block;margin-bottom:6px}
+.more span{font-size:1.05rem;line-height:1.4}
+@media(min-width:720px){.more{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(min-width:1000px){.more{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+/* ---------- 02 the gift ---------- */
+.scenes{list-style:none;margin:36px 0 0;padding:0;display:grid;grid-template-columns:minmax(0,1fr);gap:0 32px}
+.scenes li{padding:22px 0;border-top:1.5px solid var(--ink);min-width:0}
+.scenes b{display:block;font:400 1.4rem/1.2 var(--serif);margin-bottom:6px}
+.scenes span{color:var(--ink-2)}
+@media(min-width:900px){.scenes{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+.dedi{display:grid;grid-template-columns:minmax(0,1fr);gap:36px;margin-top:40px;align-items:center}
+.dedi h3{font-size:clamp(1.5rem,2.6vw,2rem)}
+.dedi-text>p{color:var(--ink-2);max-width:46ch;margin:12px 0 0}
+.dedi-text>p.wrap{margin-top:26px;padding-top:20px;border-top:1px solid var(--rule)}
+.dedi-text>p.wrap b{color:var(--ink)}
+#gift-form{margin-top:22px;max-width:460px}
+.field{display:block;margin:0 0 18px}
+.field>span,.from legend{display:block;margin:0 0 8px;padding:0}
+.field input{width:100%;min-height:52px;padding:12px 14px;border:1.5px solid #bdb8ae;border-radius:10px;background:var(--sheet);color:var(--ink);font:400 1.05rem var(--sans)}
+.field input:focus-visible{outline-offset:1px;border-color:var(--ink);border-radius:10px}
+.from{border:0;margin:0 0 18px;padding:0;min-width:0;display:flex;flex-wrap:wrap;gap:8px}
+.from legend{float:left;width:100%}
+.from label{cursor:pointer}
+.from input{position:absolute;opacity:0;width:1px;height:1px}
+.from label span{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:999px;border:1.5px solid var(--ink);background:var(--sheet);font:700 .95rem/1 var(--sans);transition:background-color .2s,color .2s}
+.from input:checked+span{background:var(--ink);color:var(--paper)}
+.from input:focus-visible+span{outline:3px solid var(--c5);outline-offset:2px}
+
+.cover{margin:0;justify-self:center;width:min(100%,360px)}
+.cover-sheet{position:relative;aspect-ratio:8.5/11;display:flex;flex-direction:column;padding:9% 8% 8%;background:var(--sheet);border-radius:4px;box-shadow:var(--shadow);overflow:hidden;transform:rotate(1.4deg)}
+.cover-sheet::before{content:"";position:absolute;left:0;right:0;top:0;height:8px;background:linear-gradient(90deg,var(--c1) 0 16.66%,var(--c2) 0 33.33%,var(--c3) 0 50%,var(--c4) 0 66.66%,var(--c5) 0 83.33%,var(--c6) 0)}
+.cover-title{font:400 clamp(1.5rem,7vw,2.05rem)/1.04 var(--serif);letter-spacing:-.02em;margin:10px 0 0;overflow-wrap:anywhere;text-wrap:balance}
+.cover-for{font:italic 400 1rem/1.3 var(--sans);color:var(--ink-2);margin:8px 0 14px;padding-bottom:10px;border-bottom:1.5px solid var(--ink);overflow-wrap:anywhere}
+.cover-plate{position:relative;flex:1;min-height:0;border-radius:2px;overflow:hidden;background:#fff}
+.cover-plate img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:50% 50%;filter:brightness(1.05)}
+.cover .btn{margin-top:18px;width:100%;white-space:normal;text-align:left;overflow-wrap:anywhere}
+.cover figcaption{margin-top:18px;font:400 .76rem/1.5 var(--mono);color:var(--ink-2);text-wrap:balance}
+@media(min-width:900px){.dedi{grid-template-columns:repeat(12,minmax(0,1fr));gap:24px}.dedi-text{grid-column:span 6}.cover{grid-column:8 / span 5}}
+
+/* ---------- 03 how it works, 04 what you get (were inline on the old home page) ---------- */
+.how{display:grid;grid-template-columns:minmax(0,1fr);gap:0;counter-reset:s;margin:26px 0 0;padding:0}
+.how li{list-style:none;padding:26px 0;border-top:1.5px solid var(--ink);min-width:0;display:grid;grid-template-columns:3.2rem 1fr;gap:12px;align-items:baseline}
+.how li::before{counter-increment:s;content:counter(s);font:400 2.4rem/1 var(--serif);color:var(--accent)}
+.how b{font:400 1.3rem/1.2 var(--serif);display:block;margin-bottom:4px}
+.how span{color:var(--ink-2)}
+@media(min-width:900px){.how{grid-template-columns:repeat(3,minmax(0,1fr));gap:0 32px}}
+.redraw{margin:8px 0 0;padding-top:22px;border-top:1px solid var(--rule);color:var(--ink-2);max-width:62ch}
+.redraw b{color:var(--ink)}
+.close{display:grid;grid-template-columns:minmax(0,1fr);gap:30px;align-items:start}
+.close .lede{max-width:40ch}
+@media(min-width:900px){.close{grid-template-columns:1fr 1fr;gap:60px}}
+.home .outro .btn{flex:none}
+/* real PDF cover in 04 (added 11 Nov 2026) */
+.real-cover{margin:22px 0 0;max-width:340px}
+.real-cover img{display:block;width:100%;height:auto;border-radius:3px;box-shadow:var(--shadow)}
+.real-cover figcaption{font:400 .78rem/1.4 var(--mono);color:var(--mute);margin-top:10px}

@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Make your coloring book | Color My Photo</title>
+<meta name="description" content="Turn up to 20 of your photos into a printable coloring book. See one page free, then $12 one-time. No subscription, no account.">
+<meta name="theme-color" content="#fbfaf7">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%96%8D%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="preload" href="fonts/YoungSerif-Regular.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="stylesheet" href="make.css">
+</head>
+<body>
+<header class="top"><a class="brand" href="index.html"><i aria-hidden="true"></i>Color My Photo</a><span class="top-price">$12 once, no subscription</span></header>
+<div class="bar-test" id="mockbar" hidden>Local test: payment was simulated.</div>
+<noscript><p class="notice">Please turn on JavaScript to use this page.</p></noscript>
+
+<main>
+<section class="hero" id="hero">
+  <div>
+    <p class="kicker rv">A printable coloring book</p>
+    <h1 class="split">Your photos, drawn as a <span class="mark">coloring book<svg viewBox="0 0 400 30" preserveAspectRatio="none" aria-hidden="true"><path d="M4 20 C 90 6, 200 4, 396 14"/></svg></span></h1>
+    <p class="lede rv" style="--d:1">Add up to 20 photos. See one page free before you pay. Print the whole book at home tonight.</p>
+    <div class="hero-cta rv" style="--d:2">
+      <a class="btn" href="#sec-add">Start with a free page <span class="arr" aria-hidden="true">&rarr;</span></a>
+      <span class="note">$12 once for the whole book. No card needed for the preview.</span>
+    </div>
+  </div>
+  <figure class="pin rv" style="--d:1">
+    <div class="pin-stage">
+    <div class="pin-page"><img src="samples/page_child.png" alt="The coloring page our process drew from the photo" width="900" height="1200"></div>
+    <div class="pin-photo"><span class="tape" aria-hidden="true"></span><img src="samples/photo_child.jpg" alt="Example photo: a girl hugging a teddy bear" width="799" height="1066"></div>
+    </div>
+    <figcaption>Example: an AI-generated photo (not a real child) and the page our process drew from it.</figcaption>
+  </figure>
+</section>
+
+<section class="facts rv" aria-label="What you get">
+  <div><b>1 page free</b><span>See your own photo as a page first.</span></div>
+  <div><b>$12 once</b><span>No subscription, no credits, no account.</span></div>
+  <div><b>Up to 20 pages</b><span>One page for each photo you add.</span></div>
+  <div><b>Print tonight</b><span>PDF book (US Letter, fine on A4) and PNGs.</span></div>
+</section>
+
+<section class="examples" id="examples">
+  <p class="kicker rv"><b>01</b>Examples</p>
+  <h2 class="rv">Clean, bold lines a child can stay inside</h2>
+  <div class="prints">
+    <figure class="print rv"><div class="pp"><img src="samples/photo_04.jpg" alt="Example photo: a fluffy cat" loading="lazy" width="800" height="961"><img src="samples/page_04.png" alt="Coloring page of the cat" loading="lazy" width="900" height="1200"></div><figcaption><span>The cat</span><span>photo to page</span></figcaption></figure>
+    <figure class="print rv" style="--d:1"><div class="pp"><img src="samples/photo_09.jpg" alt="Example photo: a yellow ride-on toy car" loading="lazy" width="800" height="533"><img src="samples/page_09.png" alt="Coloring page of the toy car" loading="lazy" width="900" height="1200"></div><figcaption><span>The toy car</span><span>photo to page</span></figcaption></figure>
+  </div>
+</section>
+
+<section id="sec-confirm" hidden>
+  <h2>Your payment <span class="badge" id="testbadge" hidden>TEST MODE: no real charge</span></h2>
+  <p id="confirm-msg" role="status"></p>
+</section>
+
+<div class="bench" id="bench">
+<header class="rv"><p class="kicker"><b>02</b>The workbench</p><h2>Make your book</h2><p>Three steps. Your photos stay in this browser until you pay, except the one you preview.</p></header>
+
+<section id="sec-add" class="step">
+  <div class="step-head"><span class="step-num" aria-hidden="true">1</span><div><h3 id="add-title">Add your photos</h3><p>Up to 20. One page per photo.</p></div></div>
+  <div>
+    <p id="again-note" class="ok" hidden>Add your photos again to make the remaining pages.</p>
+    <div class="drop" id="drop">
+      <p class="drop-title">Drop photos here</p>
+      <p class="small">JPG or PNG from your phone or computer</p>
+      <input type="file" id="file" accept="image/*" multiple hidden>
+      <button class="btn" type="button" id="pick">Choose photos</button>
+      <ul class="tips">
+        <li>One clear subject</li>
+        <li>Good light</li>
+        <li>Face visible</li>
+      </ul>
+    </div>
+    <p class="count" id="count" aria-live="polite">0 of 20</p>
+    <p class="err" id="add-msg" role="alert"></p>
+    <ul class="thumbs" id="thumbs"></ul>
+  </div>
+</section>
+
+<section id="sec-preview" class="step">
+  <div class="step-head"><span class="step-num" aria-hidden="true">2</span><div><h3>See it free</h3><p>We draw your first photo as a page, before you pay anything.</p></div></div>
+  <div>
+    <div class="pv-row"><button class="btn alt" type="button" id="btn-preview" disabled>Make my free preview page</button><span class="small" style="margin:0">About 30 to 60 seconds</span></div>
+    <p id="pv-status" role="status"></p>
+    <canvas id="pv-canvas" hidden aria-label="Preview of your coloring page with a PREVIEW watermark"></canvas>
+    <p class="small" id="pv-note" hidden>The PREVIEW stamp is only on this free draft. Your book pages are clean and made at higher quality.</p>
+  </div>
+</section>
+
+<section id="sec-pay" class="step">
+  <div class="step-head"><span class="step-num" aria-hidden="true">3</span><div><h3>Get the whole book</h3><p>One price, whatever number of photos up to 20.</p></div></div>
+  <div class="price-box">
+    <p class="price"><b>$12</b><span>one time</span></p>
+    <ul class="incl">
+      <li>Up to 20 pages, one per photo</li>
+      <li>PDF book, US Letter, fine on A4</li>
+      <li>Every page as a PNG too</li>
+      <li>Download link works for 30 days</li>
+      <li>Remake a page you don't like</li>
+      <li>Their name and your note on the cover</li>
+      <li>No subscription, no account</li>
+    </ul>
+    <label class="agree"><input type="checkbox" id="agree"><span>I agree that my pages are made and delivered right away, so the 14-day withdrawal right ends once they are delivered. If a page is wrong, we remake it or refund you. (<a href="terms.html">Terms</a>)</span></label>
+    <div class="pay-row"><button class="btn accent" type="button" id="btn-pay" disabled>Pay $12 and make my book</button></div>
+    <p class="small" id="pay-msg" role="alert"></p>
+    <p class="trust">Secure checkout by Stripe. We never see your card. Your photos stay in this browser until you pay (except the one photo you preview).</p>
+  </div>
+</section>
+</div>
+
+<section id="sec-make" hidden>
+  <header><h2>Your coloring pages</h2><p class="note-line" id="make-note">Keep this screen open while your pages are made (about 1 minute per 2 pages).</p></header>
+  <p id="overall-text" role="status">0 of 0 pages ready</p>
+  <div class="progress" aria-hidden="true"><div id="overall-bar"></div></div>
+  <p class="err" id="make-msg" role="alert"></p>
+  <ul class="pgrid" id="pgrid"></ul>
+  <div class="dl">
+    <div class="sheet">
+      <h3>Download</h3>
+      <fieldset class="gift">
+        <legend>Make it a gift <span>(optional)</span></legend>
+        <div class="gift-row">
+          <label>Child's name<input type="text" id="gift-name" maxlength="18" autocomplete="off" placeholder="Mia"></label>
+          <label>From<input type="text" id="gift-from" maxlength="24" autocomplete="off" placeholder="Grandma"></label>
+        </div>
+        <p class="gift-out" id="gift-out" aria-live="polite"></p>
+      </fieldset>
+      <button class="btn" type="button" id="btn-pdf" disabled>Download my coloring book (PDF)</button>
+      <p class="small" id="dl-msg" role="status"></p>
+      <p style="margin:18px 0 0"><b>Pages as PNG</b></p>
+      <div class="pnglist" id="pnglist"></div>
+    </div>
+    <div class="sheet">
+      <h3>Keep your link</h3>
+      <p class="small" style="margin:0">Your download link works for 30 days:</p>
+      <div class="linkrow"><input type="text" id="linkbox" readonly aria-label="Your download link"><button class="btn alt" type="button" id="btn-copy">Copy</button></div>
+      <button class="btn alt gift-send" type="button" id="btn-send">Send it as a gift</button>
+      <p class="small" style="margin:8px 0 0">Whoever opens the link can download the book and the pages until it expires.</p>
+    </div>
+  </div>
+</section>
+
+<section id="faq" class="faq">
+  <div class="rv faq-head"><p class="kicker"><b>03</b>Good to know</p><h2>Questions</h2></div>
+  <div>
+    <details><summary>What happens to my photos?</summary><p>They are resized in your browser and sent only to make your pages (via OpenAI's image service). We do not keep your photos. Until you download the full PDF, the resized photos stay saved in this browser only, so you can pay and come back. Finished pages are kept for 30 days so you can download again, then deleted.</p></details>
+    <details><summary>Is the watermark on my book?</summary><p>No. The PREVIEW stamp is only on the one free draft. The pages you pay for are clean.</p></details>
+    <details><summary>Which photos work best?</summary><p>One clear subject, good light, and a visible face. Pets, kids, toys, houses and cars all work. Busy group photos make busy pages.</p></details>
+    <details><summary>What if a page looks wrong?</summary><p>Use Remake on that page, or write to us for a refund.</p></details>
+    <details><summary>How long does it take?</summary><p>About 1 minute for every 2 pages, right after you pay. No waiting days for a seller.</p></details>
+    <details><summary>Can I print at home?</summary><p>Yes. The PDF is US Letter and prints fine on A4 too. Every page also comes as a PNG.</p></details>
+  </div>
+</section>
+
+<section class="outro rv">
+  <p class="outro-line"><span>Print it.</span> <span>Color it.</span> <span>Keep it.</span></p>
+  <a class="btn" href="#sec-add">Start with a free page <span class="arr" aria-hidden="true">&rarr;</span></a>
+</section>
+</main>
+
+<footer>
+  <p><a href="privacy.html">Privacy</a> &nbsp; <a href="terms.html">Terms</a></p>
+  <p>Contact: <a href="mailto:hello@getcolormyphoto.com">hello@getcolormyphoto.com</a></p>
+</footer>
+<script src="jspdf.umd.min.js"></script>
+<script src="make.js"></script>
+<script src="fx.js"></script>
+</body>
+</html>
