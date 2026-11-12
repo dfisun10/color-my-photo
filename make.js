@@ -178,7 +178,8 @@ async function doPay() {
   if (busyPay || !photos.length || !$('agree').checked) return;
   busyPay = true; refresh(); setBusy($('btn-pay'), true); $('pay-msg').textContent = 'Opening secure checkout…';
   try {
-    const r = await api('/checkout' + (qs.get('testkey') ? '?testkey=' + encodeURIComponent(qs.get('testkey')) : ''), { method: 'POST' }, 30000);
+    const src = (window.cmpSource && window.cmpSource()) || 'direct';
+    const r = await api('/checkout?r=' + encodeURIComponent(src) + (qs.get('testkey') ? '&testkey=' + encodeURIComponent(qs.get('testkey')) : ''), { method: 'POST' }, 30000);
     if (r.ok && r.json && r.json.url) { location.href = r.json.url; return; }
     $('pay-msg').textContent = errText(r);
   } catch (e) { $('pay-msg').textContent = e.message; }
@@ -468,6 +469,12 @@ async function init() {
     try { await navigator.clipboard.writeText(b.value); $('btn-copy').textContent = 'Copied'; } catch (e) { document.execCommand && document.execCommand('copy'); $('btn-copy').textContent = 'Copied'; }
     setTimeout(() => $('btn-copy').textContent = 'Copy', 2000);
   };
+  $('btn-copy-top').onclick = async () => {
+    const b = $('linkbox'), t = $('btn-copy-top');
+    try { await navigator.clipboard.writeText(b.value); t.textContent = 'Link copied'; } catch (e) { b.scrollIntoView({ block: 'center' }); b.select(); document.execCommand && document.execCommand('copy'); t.textContent = 'Copy the link below'; }
+    setTimeout(() => t.textContent = 'Copy my link', 2500);
+  };
+  if (window.cmpInApp) $('keep-why').textContent = 'The ' + window.cmpInApp + ' app may block the download. Copy your link, then open it in Safari or Chrome to get your book.';
   if (qs.get('mockpaid') === '1') $('mockbar').hidden = false;
 
   const saved = await dbLoad();

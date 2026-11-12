@@ -306,3 +306,12 @@ header > .kicker{margin-bottom:26px}
 .gift-out{margin:10px 0 0;font:400 .95rem/1.4 var(--serif);color:var(--ink)}
 .gift-send{margin-top:12px;width:100%}
 .gift{min-width:0}.gift-row>label{min-width:0}.gift input{width:100%;min-width:0;box-sizing:border-box}
+
+/* in-app browser notice (inapp.js) + "Save your link first" after paying */
+.inapp-bar{max-width:var(--wrap);margin:0 auto 8px;padding:14px 24px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px;background:var(--accent-soft);border-left:4px solid var(--accent);box-sizing:border-box}
+.inapp-bar p{margin:0;flex:1 1 260px;font-size:.95rem;line-height:1.45}
+.inapp-bar input{flex:1 1 100%;min-width:0;min-height:44px;font:400 .8rem var(--mono);padding:10px;border:1.5px solid #bdb8ae;border-radius:10px;background:var(--sheet);color:var(--ink)}
+.inapp-bar .btn{min-height:44px;padding:10px 20px;font-size:.92rem;white-space:normal}
+.keep-top{display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px;margin:16px 0 8px;padding:16px 20px;background:var(--accent-soft);border:2px solid var(--accent);border-radius:12px}
+.keep-top p{margin:0;flex:1 1 240px}
+.keep-top .btn{white-space:normal}
