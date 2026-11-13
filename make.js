@@ -262,13 +262,16 @@ function renderGrid() {
     } else {
       const b = document.createElement('button'); b.type = 'button'; b.className = 'link'; b.textContent = 'Remake';
       b.setAttribute('aria-label', 'Remake page ' + (i + 1));
-      b.onclick = () => { if (confirm('Remake page ' + (i + 1) + '? Each page can be remade only a limited number of times.')) retry(i, true); };
+      b.onclick = () => { if (confirm('Remake page ' + (i + 1) + '? Each order allows 40 page tries in total.')) retry(i, true); };
       li.append(b);
     }
     ul.append(li);
   });
   const total = idx.length;
   $('overall-text').textContent = done + ' of ' + total + ' pages ready';
+  const nf = idx.filter(i => pages[i].st === 'failed').length, fh = $('fail-help');
+  fh.hidden = !nf;
+  if (nf) fh.textContent = (nf === 1 ? 'One page could not be made.' : nf + ' pages could not be made.') + ' Press Try again, or write to hello@getcolormyphoto.com within 14 days and we will remake or refund the page (we reply within 24 h). Your order link: ' + $('linkbox').value;
   $('make-note').textContent = total && done === total ? 'All pages are ready. Download your book below.' : 'Keep this screen open while your pages are made (about 1 minute per 2 pages).';
   $('overall-bar').style.width = (total ? done / total * 100 : 0) + '%';
   $('overall-bar').parentNode.classList.toggle('full', !!total && done === total);
@@ -290,6 +293,8 @@ function showGift() {
   const g = getGift(), l = giftLine(g);
   $('gift-out').textContent = 'The cover will say: “' + giftTitle(g) + '”' + (l ? ' and “' + l + '”' : '');
   if (typeof REF !== 'undefined' && REF) $('linkbox').value = location.origin + location.pathname + '?ref=' + encodeURIComponent(REF) + giftHash(g);
+  const m = 'mailto:?subject=' + encodeURIComponent('My Color My Photo link') + '&body=' + encodeURIComponent('Your coloring book link (works for 30 days):\n' + $('linkbox').value);
+  $('btn-mail-top').href = m; $('btn-mail').href = m;
 }
 
 // ---------- PDF book design ----------

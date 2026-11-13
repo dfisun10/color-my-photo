@@ -87,6 +87,7 @@
     <p id="pv-status" role="status"></p>
     <canvas id="pv-canvas" hidden aria-label="Preview of your coloring page with a PREVIEW watermark"></canvas>
     <p class="small" id="pv-note" hidden>The PREVIEW stamp is only on this free draft. Your book pages are clean and made at higher quality.</p>
+    <p class="small" id="pv-honest">This preview is simplified line art. Your paid pages are drawn at higher quality, and details can differ from your photo.</p>
   </div>
 </section>
 
@@ -99,13 +100,15 @@
       <li>PDF book, US Letter, fine on A4</li>
       <li>Every page as a PNG too</li>
       <li>Download link works for 30 days</li>
-      <li>Remake a page you don't like</li>
+      <li>Remake a page you don't like (limit below)</li>
       <li>Their name and your note on the cover</li>
       <li>No subscription, no account</li>
     </ul>
     <label class="agree"><input type="checkbox" id="agree"><span>I agree that my pages are made and delivered right away, so the 14-day withdrawal right ends once they are delivered. If a page is wrong, we remake it or refund you. (<a href="terms.html">Terms</a>)</span></label>
     <div class="pay-row"><button class="btn accent" type="button" id="btn-pay" disabled>Pay $12 and make my book</button></div>
     <p class="small" id="pay-msg" role="alert"></p>
+    <p class="small" id="remake-limit">Remake limit: each order allows 40 page tries in total. Every page we draw and every Remake uses one try (an automatic retry after an error uses one too). Up to 20 pages leaves you at least 20 Remakes. After the 40th, write to us within 14 days and we will remake or refund the page.</p>
+    <p class="small" id="link-note">Your receipt and card statement may say Link or LINK.COM* COLOR MY PHO. That is our payment partner, Stripe.</p>
     <p class="trust">Secure checkout by Stripe. We never see your card. Your photos stay in this browser until you pay (except the one photo you preview).</p>
   </div>
 </section>
@@ -116,10 +119,13 @@
   <div class="keep-top" id="keep-top" role="note">
     <p><b>Save your link first.</b> <span id="keep-why">It brings your book back for 30 days, on any phone or computer.</span></p>
     <button class="btn accent" type="button" id="btn-copy-top">Copy my link</button>
+    <a class="btn alt" id="btn-mail-top" href="mailto:">Email this link to myself</a>
   </div>
+  <p class="small" id="help-line">Help or refund: <a href="mailto:hello@getcolormyphoto.com">hello@getcolormyphoto.com</a>, we reply within 24 h.</p>
   <p id="overall-text" role="status">0 of 0 pages ready</p>
   <div class="progress" aria-hidden="true"><div id="overall-bar"></div></div>
   <p class="err" id="make-msg" role="alert"></p>
+  <p class="err" id="fail-help" role="alert" hidden></p>
   <ul class="pgrid" id="pgrid"></ul>
   <div class="dl">
     <div class="sheet">
@@ -141,6 +147,7 @@
       <h3>Keep your link</h3>
       <p class="small" style="margin:0">Your download link works for 30 days:</p>
       <div class="linkrow"><input type="text" id="linkbox" readonly aria-label="Your download link"><button class="btn alt" type="button" id="btn-copy">Copy</button></div>
+      <a class="btn alt gift-send" id="btn-mail" href="mailto:">Email this link to myself</a>
       <button class="btn alt gift-send" type="button" id="btn-send">Send it as a gift</button>
       <p class="small" style="margin:8px 0 0">Whoever opens the link can download the book and the pages until it expires.</p>
     </div>
@@ -153,7 +160,7 @@
     <details><summary>What happens to my photos?</summary><p>They are resized in your browser and sent only to make your pages (via OpenAI's image service). We do not keep your photos. Until you download the full PDF, the resized photos stay saved in this browser only, so you can pay and come back. Finished pages are kept for 30 days so you can download again, then deleted.</p></details>
     <details><summary>Is the watermark on my book?</summary><p>No. The PREVIEW stamp is only on the one free draft. The pages you pay for are clean.</p></details>
     <details><summary>Which photos work best?</summary><p>One clear subject, good light, and a visible face. Pets, kids, toys, houses and cars all work. Busy group photos make busy pages.</p></details>
-    <details><summary>What if a page looks wrong?</summary><p>Use Remake on that page, or write to us for a refund.</p></details>
+    <details><summary>What if a page looks wrong?</summary><p>Use Remake on that page (each order has 40 page tries in total), or write to us within 14 days and we refund you. Pages are simplified line art drawn by AI, so details can differ from your photo.</p></details>
     <details><summary>How long does it take?</summary><p>About 1 minute for every 2 pages, right after you pay. No waiting days for a seller.</p></details>
     <details><summary>Can I print at home?</summary><p>Yes. The PDF is US Letter and prints fine on A4 too. Every page also comes as a PNG.</p></details>
   </div>
@@ -167,7 +174,7 @@
 
 <footer>
   <p><a href="privacy.html">Privacy</a> &nbsp; <a href="terms.html">Terms</a></p>
-  <p>Contact: <a href="mailto:hello@getcolormyphoto.com">hello@getcolormyphoto.com</a></p>
+  <p>Help or refund: <a href="mailto:hello@getcolormyphoto.com">hello@getcolormyphoto.com</a>, we reply within 24 h.</p>
 </footer>
 <script src="jspdf.umd.min.js"></script>
 <script src="inapp.js"></script>

@@ -315,3 +315,5 @@ header > .kicker{margin-bottom:26px}
 .keep-top{display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px;margin:16px 0 8px;padding:16px 20px;background:var(--accent-soft);border:2px solid var(--accent);border-radius:12px}
 .keep-top p{margin:0;flex:1 1 240px}
 .keep-top .btn{white-space:normal}
+#fail-help{margin:8px 0;font-size:.95rem;word-break:break-word}
+.keep-top .btn.alt,#btn-mail{white-space:normal;text-decoration:none;text-align:center}
