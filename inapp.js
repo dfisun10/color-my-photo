@@ -1,6 +1,6 @@
 // Shared by index.html and make.html (load before the page's own scripts).
 // 1) Source tag: ?r=ig|tt|pin|friends|etsy|ad is kept for this tab; checkout sends it to Stripe (metadata r), else "direct".
-// 2) In-app browsers (Instagram, Facebook, TikTok) may block the PDF/PNG download: a calm notice asks to open the page in Safari/Chrome first.
+// 2) In-app browsers (Instagram, Pinterest, Facebook, TikTok, or any iOS/Android webview) may block the PDF/PNG download: a calm notice asks to open the page in Safari/Chrome first.
 (function () {
   'use strict';
   var SOURCES = ['ig', 'tt', 'pin', 'friends', 'etsy', 'ad'];
@@ -13,16 +13,28 @@
   };
 
   var ua = navigator.userAgent || '';
-  var app = /Instagram/i.test(ua) ? 'Instagram' : /FBAN|FBAV|FB_IAB|FBIOS/i.test(ua) ? 'Facebook'
-    : /musical_ly|BytedanceWebview|TikTok/i.test(ua) ? 'TikTok' : '';
+  // Known apps by name; unknown webviews: iPhone/iPad UA without "Safari/", Android UA with "; wv)".
+  function detect(u) {
+    if (/Pinterest/i.test(u)) return 'Pinterest';
+    if (/Instagram/i.test(u)) return 'Instagram';
+    if (/FBAN|FBAV|FB_IAB|FBIOS/i.test(u)) return 'Facebook';
+    if (/musical_ly|BytedanceWebview|TikTok/i.test(u)) return 'TikTok';
+    if (/\b(iPhone|iPad|iPod)\b/.test(u) && !/Safari\//.test(u)) return 'app';
+    if (/Android/.test(u) && /; wv\)/.test(u)) return 'app';
+    return '';
+  }
+  window.cmpDetectInApp = detect;
+  var app = detect(ua);
   window.cmpInApp = app;
+  var who = app === 'app' ? 'an app' : 'the ' + app + ' app';
+  window.cmpInAppWho = who;
   if (!app) return;
   document.documentElement.classList.add('inapp');
   function show() {
     if (document.getElementById('inapp-bar')) return;
     var bar = document.createElement('div');
     bar.className = 'inapp-bar'; bar.id = 'inapp-bar'; bar.setAttribute('role', 'note');
-    bar.innerHTML = '<p><b>You are in the ' + app + ' app.</b> It may not let you download your book. ' +
+    bar.innerHTML = '<p><b>You are in ' + who + '.</b> It may not let you download your book. ' +
       'Open this page in Safari or Chrome first: tap <b>&#8943;</b> (top right), then <b>Open in browser</b>.</p>' +
       '<button class="btn alt" type="button" id="inapp-copy">Copy page link</button>';
     var top = document.querySelector('header.top');

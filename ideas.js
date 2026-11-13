@@ -52,7 +52,7 @@
     IDEAS.forEach(function (d, i) {
       var b = document.createElement('button');
       b.type = 'button'; b.className = 'chip'; b.textContent = d.label; b.setAttribute('aria-pressed', 'false');
-      b.addEventListener('click', function () { select(i, true); });
+      b.addEventListener('click', function () { pick(i, true); });
       d.chip = b; chipsEl.appendChild(b);
     });
     chipsEl.addEventListener('keydown', function (e) {
@@ -63,7 +63,7 @@
       if (at < 0) at = live.indexOf(IDEAS[cur]);
       var next = live[(at + step + live.length) % live.length];
       if (!next) return;
-      e.preventDefault(); next.chip.focus(); select(IDEAS.indexOf(next), true);
+      e.preventDefault(); next.chip.focus(); pick(IDEAS.indexOf(next), true);
     });
     sec.classList.add('js', 'wait');
     chipsEl.hidden = false; handle.hidden = false;
@@ -115,39 +115,43 @@
       }, calm ? 0 : 200);
     }
 
-    // An example whose pictures are missing loses its chip; the first one that loads is shown.
-    function settle() {
-      if (shown) return;
-      for (var i = 0; i < IDEAS.length; i++) {
-        if (IDEAS[i].ok === undefined) return;
-        if (IDEAS[i].ok) { select(i, false); shown = true; sec.classList.remove('wait'); if (inView) sweep(); return; }
-      }
-      chipsEl.hidden = true; $('idea').hidden = true; sec.classList.remove('wait');   // nothing loaded: text ideas only
-    }
-    function probe() {
-      IDEAS.forEach(function (d) {
-        var left = 2, bad = false;
-        [d.photo, d.page].forEach(function (src) {
-          var im = new Image();
-          im.onload = im.onerror = function (e) {
-            if (e.type === 'error') bad = true;
-            if (--left) return;
-            d.ok = !bad; if (bad) d.chip.hidden = true;
-            settle();
-          };
-          im.src = src;
-        });
+    // Lazy: only the first example loads when the section is near; the others load when their chip is used.
+    // An example whose pictures are missing loses its chip.
+    function load(i, cb) {
+      var d = IDEAS[i];
+      if (d.ok !== undefined) { cb(d.ok); return; }
+      if (d.cbs) { d.cbs.push(cb); return; }
+      d.cbs = [cb];
+      var left = 2, bad = false;
+      [d.photo, d.page].forEach(function (src) {
+        var im = new Image();
+        im.onload = im.onerror = function (e) {
+          if (e.type === 'error') bad = true;
+          if (--left) return;
+          d.ok = !bad; if (bad) d.chip.hidden = true;
+          d.cbs.forEach(function (f) { f(d.ok); });
+        };
+        im.src = src;
       });
     }
+    function reveal() { if (shown) return; shown = true; sec.classList.remove('wait'); if (inView) sweep(); }
+    function pick(i, user) {
+      load(i, function (ok) { if (!ok) return; var first = !shown; select(i, user); if (first) reveal(); });
+    }
+    function probe(i) {
+      if (shown) return;
+      if (i >= IDEAS.length) { chipsEl.hidden = true; $('idea').hidden = true; sec.classList.remove('wait'); return; }
+      load(i, function (ok) { if (ok) pick(i, false); else probe(i + 1); });
+    }
     if ('IntersectionObserver' in window) {
-      var near = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { near.disconnect(); probe(); } }, { rootMargin: '900px 0px' });
+      var near = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { near.disconnect(); probe(0); } }, { rootMargin: '300px 0px' });
       near.observe(sec);
       var see = new IntersectionObserver(function (es) {
         if (!es[0].isIntersecting) return;
         see.disconnect(); inView = true; if (shown) sweep();
       }, { threshold: .4 });
       see.observe(card);
-    } else { inView = true; probe(); }
+    } else { inView = true; probe(0); }
 
     // The handle scrubs between photo and page. Pointer events live on the handle only,
     // and the card keeps touch-action: pan-y, so a thumb scrolling the page is never trapped.
@@ -174,10 +178,10 @@
   var title = $('cover-title'), forEl = $('cover-for'), coverCap = $('cover-cap'), giftCta = $('gift-cta-text');
   if (!form || !nameEl || !title || !forEl) return;
   var KEY = 'cmp_gift', radios = form.querySelectorAll('input[name="from"]');
-  function clean(v) { return String(v || '').replace(/\s+/g, ' ').trim().slice(0, 20); }
+  function clean(v, n) { return String(v || '').replace(/\s+/g, ' ').trim().slice(0, n || 24); }
   function picked() { for (var i = 0; i < radios.length; i++) if (radios[i].checked) return radios[i].value; return ''; }
   function paint(save) {
-    var n = clean(nameEl.value), me = picked() === 'Me', from = me ? clean(meEl.value) : picked(), who = n || 'Mia';
+    var n = clean(nameEl.value, 18), me = picked() === 'Me', from = me ? clean(meEl.value) : picked(), who = n || 'Mia';
     meRow.hidden = !me;
     title.textContent = who + '\'s Coloring Book';
     forEl.textContent = 'For ' + who + (from ? ', love ' + from : '');
@@ -189,7 +193,7 @@
   try {
     var g = JSON.parse(localStorage.getItem(KEY) || 'null');
     if (g && typeof g.name === 'string') {
-      nameEl.value = clean(g.name);
+      nameEl.value = clean(g.name, 18);
       var f = clean(g.from), hit = false;
       for (var i = 0; i < radios.length; i++) if (radios[i].value === f && f !== 'Me') { radios[i].checked = hit = true; }
       if (!hit) { radios[radios.length - 1].checked = true; meEl.value = f; }

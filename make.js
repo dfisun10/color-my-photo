@@ -7,9 +7,11 @@ const API = LOCAL ? (sessionStorage.getItem('cmp_api') || 'http://localhost:8788
 'use strict';
 const MAX = 20, LONG = 1536;
 const NET_MSG = "Can't reach our server. Check your connection and try again.";
-const $ = id => document.getElementById(id);
+const STUB = {};   // elements only make.html has (order.html lacks them): detached stand-ins keep the shared code safe
+const $ = id => document.getElementById(id) || (id === 'pay-hint' || id === 'back-note' ? (STUB[id] = STUB[id] || document.createElement('p')) : null);
 const qs = new URLSearchParams(location.search);
 const REF = qs.get('ref');
+const ORDER = document.body.dataset.mode === 'order'; // /order page: Etsy order code instead of payment
 
 let photos = [];            // [{blob, url}] position = index
 const pages = {};           // i -> {st:'wait'|'making'|'done'|'failed', url, blob, w, h, err}
@@ -38,7 +40,7 @@ function b64ToBlob(b64) {
 function imgSize(url) {
   return new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = url; });
 }
-function setBusy(btn, on) { btn.disabled = on; btn.classList.toggle('busy', on); }
+function setBusy(btn, on) { btn.disabled = on; btn.classList.toggle('busy', on); if (btn.id === 'btn-pdf' && $('btn-pdf-top')) { $('btn-pdf-top').disabled = on; $('btn-pdf-top').classList.toggle('busy', on); } }
 
 // ---------- IndexedDB ----------
 function db() {
@@ -141,6 +143,7 @@ function renderThumbs() {
 function refresh() {
   $('btn-preview').disabled = busyPrev || !photos.length;
   $('btn-pay').disabled = busyPay || !photos.length || !$('agree').checked;
+  $('pay-hint').textContent = busyPay ? '' : !photos.length ? 'To pay: add a photo above, then tick the box.' : !$('agree').checked ? 'To pay: tick the box above.' : '';
   $('pick').disabled = photos.length >= MAX;
 }
 
@@ -189,7 +192,7 @@ async function doPay() {
 // ---------- paid flow ----------
 async function confirmPayment() {
   $('sec-confirm').hidden = false;
-  const msg = $('confirm-msg'); msg.textContent = 'Confirming your payment…';
+  const msg = $('confirm-msg'); msg.textContent = ORDER ? 'Opening your order…' : 'Confirming your payment…';
   const end = Date.now() + 120000;
   while (true) {
     try {
@@ -202,7 +205,7 @@ async function confirmPayment() {
     } catch (e) { msg.textContent = NET_MSG; }
     if (Date.now() > end) break;
     await new Promise(r => setTimeout(r, 3000));
-    if (msg.textContent === NET_MSG) msg.textContent = 'Confirming your payment…';
+    if (msg.textContent === NET_MSG) msg.textContent = ORDER ? 'Opening your order…' : 'Confirming your payment…';
   }
   msg.textContent = 'We could not confirm the payment yet. If you were charged, write to hello@getcolormyphoto.com with your receipt.';
   return null;
@@ -228,8 +231,20 @@ function retry(i, redo) {
   pages[i] = { st: 'wait', old: pages[i] && pages[i].st === 'done' ? pages[i] : null };
   queue.push({ i, redo }); renderGrid(); pump();
 }
+// Screen wake lock while pages are made (harmless where unsupported).
+let wl = null;
+async function wake(on) {
+  try {
+    if (on) { if (!wl && navigator.wakeLock) { wl = await navigator.wakeLock.request('screen'); wl.addEventListener && wl.addEventListener('release', () => { wl = null; }); } }
+    else if (wl) { const w = wl; wl = null; await w.release(); }
+  } catch (e) { wl = null; }
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && (running > 0 || queue.length)) wake(true); });
 function pump() {
-  while (running < 2 && queue.length) { const j = queue.shift(); running++; makeOne(j).finally(() => { running--; pump(); }); }
+  while (running < (ORDER && !(pages[0] && pages[0].st === 'done') ? 1 : 2) && queue.length) {
+    // order page: page 1 alone first
+    const j = queue.shift(); running++; makeOne(j).finally(() => { running--; pump(); }); }
+  wake(running > 0 || queue.length > 0);
 }
 async function makeOne(j) {
   const i = j.i, old = pages[i] && pages[i].old;
@@ -242,6 +257,22 @@ async function makeOne(j) {
            if (old) $('make-msg').textContent = 'Page ' + (i + 1) + ': ' + errText(r); }
   } catch (e) { pages[i] = old ? Object.assign({}, old) : { st: 'failed', err: e.message, redo: false }; if (old) $('make-msg').textContent = 'Page ' + (i + 1) + ': ' + e.message; }
   renderGrid();
+}
+let replaceAt = -1;
+async function replacePhoto(f) {
+  const i = replaceAt; replaceAt = -1;
+  const msg = $('make-msg');
+  if (!f || i < 0 || !photos[i]) return;
+  try {
+    const b = await decode(f);
+    URL.revokeObjectURL(photos[i].url);
+    photos[i] = { blob: b, url: URL.createObjectURL(b) };
+  } catch (e) {
+    msg.textContent = e.message === 'small' ? 'That photo is too small (at least 300 pixels on each side). Page ' + (i + 1) + ' is unchanged.' : "That photo can't be read here. Please use JPG or PNG. Page " + (i + 1) + ' is unchanged.';
+    return;
+  }
+  msg.textContent = 'Page ' + (i + 1) + ': trying your new photo. Every try counts toward the 40 tries for this order.';
+  renderThumbs(); await dbSave(); retry(i, false);
 }
 function renderGrid() {
   const idx = Object.keys(pages).map(Number).sort((a, b) => a - b);
@@ -259,6 +290,11 @@ function renderGrid() {
       const s = document.createElement('span'); s.textContent = p.err || 'Failed'; s.className = 'err'; s.style.fontSize = '.8rem';
       const b = document.createElement('button'); b.type = 'button'; b.className = 'link'; b.textContent = 'Try again';
       b.onclick = () => retry(i, !!p.redo); li.append(s, b);
+      if (!p.missing && photos[i] && !photos[i].stub) {
+        const r = document.createElement('button'); r.type = 'button'; r.className = 'rlink'; r.textContent = 'Replace photo';
+        r.setAttribute('aria-label', 'Replace the photo for page ' + (i + 1));
+        r.onclick = () => { replaceAt = i; $('file-replace').click(); }; li.append(r);
+      }
     } else {
       const b = document.createElement('button'); b.type = 'button'; b.className = 'link'; b.textContent = 'Remake';
       b.setAttribute('aria-label', 'Remake page ' + (i + 1));
@@ -277,6 +313,7 @@ function renderGrid() {
   $('overall-bar').parentNode.classList.toggle('full', !!total && done === total);
   $('btn-pdf').textContent = done ? 'Download my coloring book (PDF, ' + done + (done === 1 ? ' page)' : ' pages)') : 'Download my coloring book (PDF)';
   $('btn-pdf').disabled = !done;
+  const bt = $('btn-pdf-top'); if (bt) { bt.hidden = !done; bt.textContent = $('btn-pdf').textContent; bt.disabled = !done || $('btn-pdf').classList.contains('busy'); }
   const pl = $('pnglist'); pl.textContent = '';
   idx.forEach(i => { if (pages[i].st === 'done') { const a = document.createElement('a'); a.href = pages[i].url; a.download = 'color-my-photo-page-' + (i + 1) + '.png'; a.textContent = 'Page ' + (i + 1) + ' (PNG)'; pl.append(a); } });
 }
@@ -431,9 +468,14 @@ async function doPdf() {
     for (const i of idx) imgs[i] = await inkOnWhite(pages[i]);
     await drawBook(pdf, idx, imgs);
     pdf.save('color-my-photo-book.pdf');
-    msg.textContent = 'Your PDF was created.';
-    const all = photos.length > 0 && photos.every((_, i) => pages[i] && pages[i].st === 'done');
-    if (all) { await dbClear(); msg.textContent += ' Your photos were removed from this browser.'; }
+    if (window.cmpInApp) {
+      // An in-app browser may silently drop the download: never claim success, never wipe the photos.
+      msg.textContent = 'We asked ' + (window.cmpInAppWho || 'this app') + ' to save the PDF. If nothing was saved, copy your link above and open it in Safari or Chrome. Your photos are still here.';
+    } else {
+      msg.textContent = 'Your PDF was created.';
+      const all = photos.length > 0 && photos.every((_, i) => pages[i] && pages[i].st === 'done');
+      if (all) { await dbClear(); msg.textContent += ' Your photos were removed from this browser.'; }
+    }
   } catch (e) { msg.textContent = 'Could not build the PDF. Please try again.'; }
   setBusy(btn, false); renderGrid();
 }
@@ -444,6 +486,24 @@ function ui() {
   if (!('IntersectionObserver' in window)) { els.forEach(e => e.classList.add('in')); return; }
   const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -8% 0px' });
   els.forEach(e => io.observe(e));
+}
+
+// ---------- order page: redeem the Etsy order code, then reload with ?ref= like a returning paid order ----------
+function initCode() {
+  $('sec-code').hidden = false;
+  const go = async () => {
+    const code = $('code-in').value, msg = $('code-msg'), b = $('code-go');
+    if (!code.trim()) { msg.textContent = 'Type the code from your PDF.'; return; }
+    setBusy(b, true); msg.textContent = 'Checking your code…';
+    try {
+      const r = await api('/redeem', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code }) }, 30000);
+      if (r.ok && r.json && r.json.ref) { location.href = location.pathname + '?ref=' + encodeURIComponent(r.json.ref) + (qs.get('api') ? '&api=' + encodeURIComponent(qs.get('api')) : ''); return; }
+      msg.textContent = errText(r);
+    } catch (e) { msg.textContent = e.message; }
+    setBusy(b, false);
+  };
+  $('code-go').onclick = go;
+  $('code-in').addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
 }
 
 // ---------- init ----------
@@ -458,7 +518,10 @@ async function init() {
   $('btn-preview').onclick = doPreview;
   $('btn-pay').onclick = doPay;
   $('agree').onchange = refresh;
-  $('btn-pdf').onclick = doPdf;
+  $('btn-pdf').onclick = doPdf; if ($('btn-pdf-top')) $('btn-pdf-top').onclick = doPdf;
+  { const fr = document.createElement('input'); fr.type = 'file'; fr.accept = 'image/*'; fr.id = 'file-replace'; fr.hidden = true;
+    fr.onchange = e => { const f = e.target.files && e.target.files[0]; e.target.value = ''; replacePhoto(f); }; document.body.appendChild(fr); }
+  addEventListener('pageshow', e => { if (e.persisted) { busyPay = false; setBusy($('btn-pay'), false); $('pay-msg').textContent = ''; refresh(); } });
   try { const m = location.hash.match(/^#gift=(.+)$/); if (m) { const g = JSON.parse(decodeURIComponent(m[1])); setGift({ name: cleanName(g.name, 18), from: cleanName(g.from, 24) }); } } catch (e) {}
   { const g = getGift(); $('gift-name').value = g.name; $('gift-from').value = g.from; }
   ['gift-name', 'gift-from'].forEach(id => $(id).addEventListener('input', () => { setGift({ name: cleanName($('gift-name').value, 18), from: cleanName($('gift-from').value, 24) }); showGift(); }));
@@ -479,14 +542,17 @@ async function init() {
     try { await navigator.clipboard.writeText(b.value); t.textContent = 'Link copied'; } catch (e) { b.scrollIntoView({ block: 'center' }); b.select(); document.execCommand && document.execCommand('copy'); t.textContent = 'Copy the link below'; }
     setTimeout(() => t.textContent = 'Copy my link', 2500);
   };
-  if (window.cmpInApp) $('keep-why').textContent = 'The ' + window.cmpInApp + ' app may block the download. Copy your link, then open it in Safari or Chrome to get your book.';
+  if (window.cmpInApp) $('keep-why').textContent = 'You are in ' + (window.cmpInAppWho || 'an app') + ', which may block the download. Copy your link, then open it in Safari or Chrome to get your book.';
   if (qs.get('mockpaid') === '1') $('mockbar').hidden = false;
 
   const saved = await dbLoad();
   photos = saved.map(b => b ? { blob: b, url: URL.createObjectURL(b) } : { stub: true });
   renderThumbs(); refresh();
-  if (!REF) return;
+  if (qs.get('back') === '1' && !REF) { $('back-note').textContent = photos.length ? 'Your photos are still here. You were not charged.' : 'You were not charged. Add your photos again to continue.'; $('back-note').hidden = false; history.replaceState(null, '', location.pathname + location.hash); }
+  if (!REF) { if (ORDER) initCode(); return; }
+  if (ORDER) $('bench').hidden = false;
 
+  if ($('gift-fs')) $('btn-pdf').parentNode.insertBefore($('gift-fs'), $('btn-pdf'));   // gift fields stay editable after paying
   $('sec-preview').hidden = true; $('sec-pay').hidden = true; document.body.classList.add('paid'); $('add-title').textContent = 'Add more photos';
   // One tab per order, so pages are never made twice.
   if (navigator.locks) {
@@ -498,7 +564,7 @@ async function init() {
   const st = await confirmPayment();
   if (!st) return;
   paid = true;
-  $('confirm-msg').textContent = 'Payment confirmed. Thank you!';
+  $('confirm-msg').textContent = ORDER ? 'Your code is accepted. Thank you!' : 'Payment confirmed. Thank you!';
   $('testbadge').hidden = !st.test;
   $('sec-make').hidden = false;
   $('linkbox').value = location.origin + location.pathname + '?ref=' + encodeURIComponent(REF);

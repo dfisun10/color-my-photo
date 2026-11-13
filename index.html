@@ -24,11 +24,11 @@
 <main>
 <section class="hero">
   <div>
-    <p class="kicker rv">A printable coloring book</p>
+    <p class="kicker rv">A Christmas gift for Grandma</p>
     <h1 class="split">They've colored a hundred cartoon dogs. Now let them color <span class="mark">their own.<svg viewBox="0 0 400 30" preserveAspectRatio="none" aria-hidden="true"><path d="M4 20 C 90 6, 200 4, 396 14"/></svg></span></h1>
-    <p class="lede rv" style="--d:1">Add your photos: the dog, Grandma, the house. We redraw each one as a coloring page. See one page free, then print the whole book at home tonight. $12 once.</p>
+    <p class="lede rv" style="--d:1">A gift for Grandma, made from your photos, with her name on the cover. Get a free preview, then $12 once for up to 20 pages, a PDF you print at home.</p>
     <div class="hero-cta rv" style="--d:2">
-      <a class="btn" id="btn-make" href="make.html">Start with a free page <span class="arr" aria-hidden="true">&rarr;</span></a>
+      <a class="btn" id="btn-make" href="make.html#sec-add">Start with a free page <span class="arr" aria-hidden="true">&rarr;</span></a>
       <span class="note">$12 once for the whole book. No card needed for the preview.</span>
     </div>
   </div>
@@ -65,7 +65,7 @@
     <div class="idea-copy" aria-live="polite">
       <p class="idea-hook" id="idea-hook">Grandma brings a book where she is on page one.</p>
       <p class="idea-good"><b>Good for</b><span id="idea-good">a grandparent with a visit coming up.</span></p>
-      <a class="btn" id="idea-cta" href="make.html"><span id="idea-cta-text">Try it with your photo of Grandma</span> <span class="arr" aria-hidden="true">&rarr;</span></a>
+      <a class="btn" id="idea-cta" href="make.html#sec-add"><span id="idea-cta-text">Try it with your photo of Grandma</span> <span class="arr" aria-hidden="true">&rarr;</span></a>
       <p class="small">Works best with one clear subject, good light and a visible face. Your first page is free.</p>
     </div>
   </div>
@@ -93,7 +93,7 @@
       <h3>Put their name on the cover</h3>
       <p>The cover reads like a present: their name in the title, and who it is from underneath.</p>
       <form id="gift-form" hidden autocomplete="off">
-        <label class="field"><span>Child's name</span><input id="gift-name" type="text" maxlength="20" placeholder="Mia" autocapitalize="words" spellcheck="false"></label>
+        <label class="field"><span>Child's name</span><input id="gift-name" type="text" maxlength="18" placeholder="Mia" autocapitalize="words" spellcheck="false"></label>
         <fieldset class="from"><legend>From</legend>
           <label><input type="radio" name="from" value="Grandma" checked><span>Grandma</span></label>
           <label><input type="radio" name="from" value="Grandpa"><span>Grandpa</span></label>
@@ -115,7 +115,7 @@
         <div class="cover-plate"><img id="cover-img" src="samples/page_04.png" alt="" loading="lazy" width="900" height="1200"></div>
       </div>
       <figcaption id="cover-cap">Cover sketch with an example name. Your real cover is built from your own pages.</figcaption>
-      <a class="btn" id="gift-cta" href="make.html"><span id="gift-cta-text">Make the book: first page free</span> <span class="arr" aria-hidden="true">&rarr;</span></a>
+      <a class="btn" id="gift-cta" href="make.html#sec-add"><span id="gift-cta-text">Make the book: first page free</span> <span class="arr" aria-hidden="true">&rarr;</span></a>
     </figure>
   </div>
 </section>
@@ -143,13 +143,14 @@
       <li>Download link works for 30 days</li>
       <li>No subscription, no account</li>
     </ul>
-    <a class="btn accent" id="btn-pro" href="make.html">Start with a free page <span class="arr" aria-hidden="true">&rarr;</span></a>
+    <a class="btn accent" id="btn-pro" href="make.html#sec-add">Start with a free page <span class="arr" aria-hidden="true">&rarr;</span></a>
   </div>
 </section>
 
 <section class="faq">
   <div class="rv faq-head"><p class="kicker"><b>05</b>Good to know</p><h2>Questions</h2></div>
   <div class="rv">
+    <details><summary>Whose name will I see when I pay?</summary><p>Checkout shows Create Once, the company behind Color My Photo. Your card statement may show Create Once or Link. Stripe handles the payment.</p></details>
     <details><summary>What happens to my photos?</summary><p>They are resized in your browser and sent only to make your pages (via OpenAI's image service). We do not keep your photos. Until you download the full PDF, the resized photos stay saved in this browser only, so you can pay and come back. Finished pages are kept for 30 days so you can download again, then deleted.</p></details>
     <details><summary>Will it look like us?</summary><p>It will look like a drawing of you. Each page is drawn from your photo, so it is a likeness and not an exact copy, and the result depends on the photo: one clear subject, good light and a visible face work best. That is why the first page is free. See yours before you pay.</p></details>
     <details><summary>What if a page looks wrong?</summary><p>Use Remake on that page, or write to us for a refund.</p></details>
@@ -159,7 +160,7 @@
 
 <section class="outro rv">
   <p class="outro-line"><span>Print it.</span> <span>Color it.</span> <span>Keep it.</span></p>
-  <a class="btn" id="btn-end" href="make.html">Start with a free page <span class="arr" aria-hidden="true">&rarr;</span></a>
+  <a class="btn" id="btn-end" href="make.html#sec-add">Start with a free page <span class="arr" aria-hidden="true">&rarr;</span></a>
 </section>
 </main>
 

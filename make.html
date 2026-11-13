@@ -94,6 +94,7 @@
 <section id="sec-pay" class="step">
   <div class="step-head"><span class="step-num" aria-hidden="true">3</span><div><h3>Get the whole book</h3><p>One price, whatever number of photos up to 20.</p></div></div>
   <div class="price-box">
+    <p class="ok" id="back-note" role="status" hidden></p>
     <p class="price"><b>$12</b><span>one time</span></p>
     <ul class="incl">
       <li>Up to 20 pages, one per photo</li>
@@ -104,11 +105,20 @@
       <li>Their name and your note on the cover</li>
       <li>No subscription, no account</li>
     </ul>
+    <fieldset class="gift" id="gift-fs">
+        <legend>Make it a gift <span>(optional)</span></legend>
+        <div class="gift-row">
+          <label>Child's name<input type="text" id="gift-name" maxlength="18" autocomplete="off" placeholder="Mia"></label>
+          <label>From<input type="text" id="gift-from" maxlength="24" autocomplete="off" placeholder="Grandma"></label>
+        </div>
+        <p class="gift-out" id="gift-out" aria-live="polite"></p>
+      </fieldset>
     <label class="agree"><input type="checkbox" id="agree"><span>I agree that my pages are made and delivered right away, so the 14-day withdrawal right ends once they are delivered. If a page is wrong, we remake it or refund you. (<a href="terms.html">Terms</a>)</span></label>
     <div class="pay-row"><button class="btn accent" type="button" id="btn-pay" disabled>Pay $12 and make my book</button></div>
+    <p class="small hint" id="pay-hint" aria-live="polite"></p>
     <p class="small" id="pay-msg" role="alert"></p>
     <p class="small" id="remake-limit">Remake limit: each order allows 40 page tries in total. Every page we draw and every Remake uses one try (an automatic retry after an error uses one too). Up to 20 pages leaves you at least 20 Remakes. After the 40th, write to us within 14 days and we will remake or refund the page.</p>
-    <p class="small" id="link-note">Your receipt and card statement may say Link or LINK.COM* COLOR MY PHO. That is our payment partner, Stripe.</p>
+    <p class="small" id="link-note">Checkout shows Create Once, the company behind Color My Photo. Your card statement may show Create Once or Link. Stripe handles the payment.</p>
     <p class="trust">Secure checkout by Stripe. We never see your card. Your photos stay in this browser until you pay (except the one photo you preview).</p>
   </div>
 </section>
@@ -126,18 +136,11 @@
   <div class="progress" aria-hidden="true"><div id="overall-bar"></div></div>
   <p class="err" id="make-msg" role="alert"></p>
   <p class="err" id="fail-help" role="alert" hidden></p>
+  <button class="btn dl-top" type="button" id="btn-pdf-top" hidden>Download my coloring book (PDF)</button>
   <ul class="pgrid" id="pgrid"></ul>
   <div class="dl">
     <div class="sheet">
       <h3>Download</h3>
-      <fieldset class="gift">
-        <legend>Make it a gift <span>(optional)</span></legend>
-        <div class="gift-row">
-          <label>Child's name<input type="text" id="gift-name" maxlength="18" autocomplete="off" placeholder="Mia"></label>
-          <label>From<input type="text" id="gift-from" maxlength="24" autocomplete="off" placeholder="Grandma"></label>
-        </div>
-        <p class="gift-out" id="gift-out" aria-live="polite"></p>
-      </fieldset>
       <button class="btn" type="button" id="btn-pdf" disabled>Download my coloring book (PDF)</button>
       <p class="small" id="dl-msg" role="status"></p>
       <p style="margin:18px 0 0"><b>Pages as PNG</b></p>
@@ -157,6 +160,7 @@
 <section id="faq" class="faq">
   <div class="rv faq-head"><p class="kicker"><b>03</b>Good to know</p><h2>Questions</h2></div>
   <div>
+    <details><summary>Whose name will I see when I pay?</summary><p>Checkout shows Create Once, the company behind Color My Photo. Your card statement may show Create Once or Link. Stripe handles the payment.</p></details>
     <details><summary>What happens to my photos?</summary><p>They are resized in your browser and sent only to make your pages (via OpenAI's image service). We do not keep your photos. Until you download the full PDF, the resized photos stay saved in this browser only, so you can pay and come back. Finished pages are kept for 30 days so you can download again, then deleted.</p></details>
     <details><summary>Is the watermark on my book?</summary><p>No. The PREVIEW stamp is only on the one free draft. The pages you pay for are clean.</p></details>
     <details><summary>Which photos work best?</summary><p>One clear subject, good light, and a visible face. Pets, kids, toys, houses and cars all work. Busy group photos make busy pages.</p></details>
