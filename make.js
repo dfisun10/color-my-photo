@@ -182,7 +182,7 @@ async function doPay() {
   busyPay = true; refresh(); setBusy($('btn-pay'), true); $('pay-msg').textContent = 'Opening secure checkout…';
   try {
     const src = (window.cmpSource && window.cmpSource()) || 'direct';
-    const r = await api('/checkout?r=' + encodeURIComponent(src) + (qs.get('testkey') ? '&testkey=' + encodeURIComponent(qs.get('testkey')) : ''), { method: 'POST' }, 30000);
+    const r = await api('/checkout?r=' + encodeURIComponent(src) + '&agreed=1' + (qs.get('testkey') ? '&testkey=' + encodeURIComponent(qs.get('testkey')) : ''), { method: 'POST' }, 30000);
     if (r.ok && r.json && r.json.url) { location.href = r.json.url; return; }
     $('pay-msg').textContent = errText(r);
   } catch (e) { $('pay-msg').textContent = e.message; }
@@ -274,6 +274,7 @@ async function replacePhoto(f) {
   msg.textContent = 'Page ' + (i + 1) + ': trying your new photo. Every try counts toward the 40 tries for this order.';
   renderThumbs(); await dbSave(); retry(i, false);
 }
+let helpOn = false;
 function renderGrid() {
   const idx = Object.keys(pages).map(Number).sort((a, b) => a - b);
   const ul = $('pgrid'); ul.textContent = '';
@@ -305,9 +306,11 @@ function renderGrid() {
   });
   const total = idx.length;
   $('overall-text').textContent = done + ' of ' + total + ' pages ready';
-  const nf = idx.filter(i => pages[i].st === 'failed').length, fh = $('fail-help');
-  fh.hidden = !nf;
-  if (nf) fh.textContent = (nf === 1 ? 'One page could not be made.' : nf + ' pages could not be made.') + ' Press Try again, or write to hello@getcolormyphoto.com within 14 days and we will remake or refund the page (we reply within 24 h). Your order link: ' + $('linkbox').value;
+  const nf = idx.filter(i => pages[i].st === 'failed').length, fh = $('fail-help'), mm = $('make-msg');
+  fh.hidden = true; fh.textContent = '';
+  // A permanent page failure shows the help text (email + order link) in #make-msg, where the buyer looks; a first-time failure set nothing there before.
+  if (nf) { mm.textContent = (nf === 1 ? 'One page could not be made.' : nf + ' pages could not be made.') + ' Press Try again, or write to hello@getcolormyphoto.com within 14 days and we will remake the page or refund you (we reply within 24 h). Your order link: ' + $('linkbox').value; helpOn = true; }
+  else if (helpOn) { if (mm.textContent.indexOf('could not be made.') > -1) mm.textContent = ''; helpOn = false; }
   $('make-note').textContent = total && done === total ? 'All pages are ready. Download your book below.' : 'Keep this screen open while your pages are made (about 1 minute per 2 pages).';
   $('overall-bar').style.width = (total ? done / total * 100 : 0) + '%';
   $('overall-bar').parentNode.classList.toggle('full', !!total && done === total);
